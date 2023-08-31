@@ -5,12 +5,14 @@ const pets = require('./data');
 const express = require('express');
 const app = express();
 
-const PORT = 8080;
+// to make sure styles.css is usable
+app.use(express.static('public'));
 
-// GET - / - returns homepage
+const PORT = 8000;
+
+// Declare that the landing page '/' will send the file/display the html file called "index" on localhost:####/
 app.get('/', (req, res) => {
-    // serve up the public folder as static index.html file
-
+    res.sendFile(__dirname + '/public/index.html');
 });
 
 // hello world route
@@ -18,34 +20,30 @@ app.get('/api', (req, res) => {
     res.send('Hello World!');
 });
 
-// get all pets from the database
+// get all pets from the database  by declaring that localhost:####/api/v1/pets will display the content of the variable 'pets' on which is stored the content of 'data.js' which the array of the different dogs object. landing on http://localhost:####/api/v1/pets should display the array to the user
 app.get('/api/v1/pets', (req, res) => {
-    // send the pets array as a response
-
+    res.send(pets);
 });
 
-// get pet by owner with query string
+// Same thing as the previous function but this time by specifying the pet's owner's name stored in the dog obeject array as a query by using .find to match the requested owner name with the correct one in the dog array /owner?owner=""
 app.get('/api/v1/pets/owner', (req, res) => {
-    // get the owner from the request
-
-
-    // find the pet in the pets array
+    const { owner } = req.query; 
     const pet = pets.find(pet => pet.owner === owner);
-
-    // send the pet as a response
-
+    res.send(pet);
 });
 
-// get pet by name
+// Same as previous function but this time using the pet's name as a parameter to GET and display matching dog
 app.get('/api/v1/pets/:name', (req, res) => {
-    // get the name from the request
-
-
-    // find the pet in the pets array
+    const { name } = req.params;
     const pet = pets.find(pet => pet.name === name);
+    res.send(pet);
+});
 
-    // send the pet as a response
-
+// Using pet's "id" as a query to GET and display matching dog
+app.get('/api/v1/pets-query', (req, res) => {
+    const { id } = req.query;
+    const pet = pets.find(pet => pet.id === parseInt(id));
+    res.send(pet);
 });
 
 app.listen(PORT, () => {
